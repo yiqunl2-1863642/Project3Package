@@ -9,6 +9,6 @@ test_that("Returns a list", {
 })
 
 test_that("Throws error for improper alternative hypothesis", {
-  y <- my_t.test(x, "abc", 0)
-  expect_error("Alternative must be 'two.sided', 'less', or 'greater")
+  x <- rnorm(10, mean = 0, sd = 1)
+  expect_error(my_t.test(x, "abc", 0), "Improper alternative")
 })

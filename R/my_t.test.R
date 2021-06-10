@@ -37,7 +37,7 @@ my_t.test <- function(x, alternative, mu) {
     my_pval <- pt(my_t, df, lower.tail = TRUE)
     # the altervative argument does not satisfy the requirement
   } else {
-    stop("Alternative must be 'two.sided', 'less', or 'greater")
+    stop("Improper alternative")
   }
   # return the resultant list
   return(list(
