@@ -13,9 +13,8 @@
 #'
 #' @export
 my_rf_cv <- function(k) {
-  data(package = "palmerpenguins")
-  penguins <- palmerpenguins::penguins
-  penguins <- penguins %>% tidyr::drop_na()
+  data("my_penguins")
+  penguins <- my_penguins %>% tidyr::drop_na()
   # create a vector that randomly assign observations to fold 1,...,k
   fold <- sample(rep(1:k, length = nrow(penguins)))
   MSE <- rep(0, k)
