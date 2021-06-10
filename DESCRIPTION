@@ -14,7 +14,11 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
     class,
-    magrittr
+    dplyr,
+    ggplot2,
+    magrittr,
+    randomForest,
+    tibble
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
