@@ -41,4 +41,5 @@
 #' gapminder %>%
 #'   group_by(continent) %>%
 #'   summarize(n_obs = n(), n_countries = n_distinct(country))
+#'
 "my_gapminder"
