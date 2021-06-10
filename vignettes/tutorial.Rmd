@@ -18,3 +18,5 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(Project3Package)
 ```
+
+This package includes four fucntions: my_t.test, my_lm, my_knn_cv, and my_rf_cv. You can install it from Github using: {r devtools::install_github("bryandmartin/Demo")}
