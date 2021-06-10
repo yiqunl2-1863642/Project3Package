@@ -20,9 +20,6 @@
 #'
 #' @export
 my_knn_cv <- function(train, cl, k_nn, k_cv) {
-  # install the proper package
-  usethis::use_package("class")
-  usethis::use_package("dplyr")
   # create a vector that randomly assign observations to fold 1,...,k_cv
   fold <- sample(rep(1:k_cv, length = nrow(train)))
   misclassification <- rep(0, k_cv)
@@ -39,7 +36,7 @@ my_knn_cv <- function(train, cl, k_nn, k_cv) {
     # record the error rate
     misclassification[i] <- mean(predict != cl_test)
   }
-  cla <- class:knn(train, train, cl, k=k_nn)
+  cla <- class::knn(train, train, cl, k=k_nn)
   cv_error <- mean(misclassification)
   return(list(cla, cv_error))
 }

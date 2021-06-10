@@ -12,15 +12,10 @@
 #' my_rf_cv(5)
 #'
 #' @export
-
-# Function: my_rf_cv, takes an input k indicating the number of splits,
-# performs a random forest cross validation, and returns an output indicating
-# the cross-validation error
-# Input: k, an integer indicating the number of folds
-# Output: a numeric indicating cross validation error
 my_rf_cv <- function(k) {
-  # install the proper package
-  usethis::use_package("randomForest")
+  data(package = "palmerpenguins")
+  penguins <- palmerpenguins::penguins
+  penguins <- penguins %>% tidyr::drop_na()
   # create a vector that randomly assign observations to fold 1,...,k
   fold <- sample(rep(1:k, length = nrow(penguins)))
   MSE <- rep(0, k)
@@ -46,3 +41,5 @@ my_rf_cv <- function(k) {
   # return the average of MSE in each fold
   return(mean(MSE))
 }
+
+utils::globalVariables(c("bill_length_mm", "bill_depth_mm", "body_mass_g", "flipper_length_mm"))
