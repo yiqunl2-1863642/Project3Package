@@ -21,10 +21,15 @@ library(Project3Package)
 
 ## Introduction
 
-This package includes four fucntions: my_t.test, my_lm, my_knn_cv, and my_rf_cv. You can install it from Github using: `r devtools::install_github("bryandmartin/Demo")`
+This package includes four fucntions: my_t.test, my_lm, my_knn_cv, and my_rf_cv. You can install it from Github using:
+
+```{r eval=FALSE}
+devtools::install_github("yiqunl2-1863642/Project3Package")
+```
 
 ## Tutorial for my_t.test
-To use the my_t.test function, the user needs to input three parameters. x represents the numeric vector data. alternative represents String input that indicates the alternative hypothesis, which must be one of "two.sided", "greater" or "less". mu represents the true value of mean. Below is three examples 
+To use the my_t.test function, the user needs to input three parameters. x represents the numeric vector data. alternative represents String input that indicates the alternative hypothesis, which must be one of "two.sided", "greater" or "less". mu represents the true value of mean. Below is three examples using different alternative hypothesis
+
 ```{r eval=FALSE}
 data <- my_gapminder$lifeExp
 
