@@ -1,3 +1,5 @@
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
+test_that("Returns a list(dataframe is of type list in r)", {
+  data(mtcars)
+  x <- my_lm(mpg ~ hp + wt, data = mtcars)
+  expect_type(x, "list")
 })
