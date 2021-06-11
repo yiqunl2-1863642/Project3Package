@@ -30,4 +30,5 @@ cl <- factor(c(rep("s",25), rep("c",25), rep("v",25)))
 my_knn_cv(train, cl, 1, 5)
 
 }
+\keyword{inference}
 \keyword{prediction}

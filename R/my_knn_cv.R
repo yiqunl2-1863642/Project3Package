@@ -6,7 +6,7 @@
 #' @param cl List of true class values of the training data.
 #' @param k_nn Numeric input used as the number of neighbors.
 #' @param k_cv Numeric input used as the number of folds.
-#' @keywords prediction
+#' @keywords inference prediction
 #'
 #' @return a list composed of class and cv_err. class is a vector of predicted
 #'   class of all observations. cv_err is the cross-validation

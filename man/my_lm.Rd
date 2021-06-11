@@ -26,4 +26,3 @@ my_lm(mpg ~ hp + wt, data = mtcars)
 
 }
 \keyword{inference}
-\keyword{prediction}

@@ -5,7 +5,7 @@
 #' @param formula String input to be used as the formula for the linear model.
 #' @param data Data frame input to be used as the data the linear model used to
 #'   fit on.
-#' @keywords inference prediction
+#' @keywords inference
 #'
 #' @return a table with rows for each coefficient of the linear model including
 #'   the intercept, and columns for \code{Estimate}, \code{Std. Error},

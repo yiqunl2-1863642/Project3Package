@@ -19,6 +19,13 @@ knitr::opts_chunk$set(
 library(Project3Package)
 ```
 
+```{r message=FALSE}
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(reshape2)
+```
+
 ## Introduction
 
 This package includes four fucntions: my_t.test, my_lm, my_knn_cv, and my_rf_cv. You can install it from Github using:
@@ -28,9 +35,134 @@ devtools::install_github("yiqunl2-1863642/Project3Package")
 ```
 
 ## Tutorial for my_t.test
-To use the my_t.test function, the user needs to input three parameters. x represents the numeric vector data. alternative represents String input that indicates the alternative hypothesis, which must be one of "two.sided", "greater" or "less". mu represents the true value of mean. Below is three examples using different alternative hypothesis
+To use the my_t.test function, the user needs to input three parameters. `x` represents the numeric vector data. `alternative` represents String input that indicates the alternative hypothesis, which must be one of `"two.sided"`, `"greater"` or `"less"`. `mu` represents the true value of mean. Below are three examples using different alternative hypothesis
 
-```{r eval=FALSE}
+First, a two sided hypothesis test, which uses `lifeExp` of `my_gapminder` as data. Suppose we have the following hypothesis, then x should be our life expectancy data. alternative should be `"two.sided"`, and mu should be 60. We would also use 0.05 as our p-value cutoff, or $\alpha$
+\begin{align}
+  H_0: \mu &= 60,\\
+  H_a: \mu &\neq 60.
+  \end{align}
+```{r}
 data <- my_gapminder$lifeExp
-
+my_t.test(data, "two.sided", 60)
 ```
+The function returns 4 outputs. `test_stat` represents the t statistic of our data. `df` represents the degrees of freedom. `alternative` represents the alternative hypothesis we used for this t test. Finally, `p_val` represents probability of observing a result as or more extreme than what we observed, assuming the null hypothesis is true. Our `p_val` for this specific test being less than $\alpha$ means that its is extremely rare that the null hypothesis is true, so we should reject the null hypothesis that the true mean is equal to 60.
+
+Secondly, we will demonstrate a one-sample hypothesis test using `my_t.test`, using a `"less"` alternative this time. The null hypothesis and alternative hypothesis is listed below. The t test will use the same `x` and same `mu` as the first example.
+ \begin{align}
+  H_0: \mu &= 60,\\
+  H_a: \mu &< 60.
+  \end{align}
+```{r}
+my_t.test(data, "less", 60)
+```
+
+The p value is still less than the cutoff, so we reject the null hypothesis that the true mean is zero and conclude that the true mean is probably less than 60. The interpretation for the other output is same as before.
+
+Thirdly, we will demonstrate an example using the same parameter except an alternative hypothesis of "`greater`". The hypothesises is listed below.
+\begin{align}
+  H_0: \mu &= 60,\\
+  H_a: \mu &> 60.
+  \end{align}
+  
+```{r}
+my_t.test(data, "greater", 60)
+```
+This time, the p value is actually greater than the cutoff, so we fail to reject the null hypothesis that the true mean is equal to zero.
+
+## Tutorial for my_lm
+`my_lm` function performs a linear regression model fitting on the given data. It takes two parameters: `formula` represents a formula class object, and `data` represents the data used for the linear regression.
+
+Here is an example of how to use my_lm for a linear regression. We will use `lifeExp` as the response variable, as well as `gdpPercap` and `continent` as the explanatory varibales. So the formula should be `lifeExp ~ gdpPercap + continent`, and the data should be `my_gapminder` where those variables come from.
+```{r}
+my_lm(lifeExp ~ gdpPercap + continent, my_gapminder)
+```
+
+The `Estimate` column represents the coefficient of the variables as well as the intercept. The coefficient for `gdpPercap` being 4.452704e-04 (may change due to randomness) means the expected difference in the response between two observations differing by one unit in `gdpPercap`, with all other covariates identical. The hypothesis test associated with `gdpPercap` is the two sided t test with the null hypothesis being $\beta_{gdp}$ = 0, and the alternative hypothesis being $\beta{gdp} \neq 0$. The result of the hypothesis test is listed in the `Pr(>|t|)` column. Using a cutoff of 0.05, `Pr(>|t|)` < $\alpha$, so we reject the null hypothesis and conclude that the variable `gdpPercap` is not insignificant in the linear regression model. Below the a plot of actual vs fitted.
+
+```{r fig.width=7, fig.height=4}
+x <- my_lm(lifeExp ~ gdpPercap + continent, my_gapminder)
+y <- model.matrix(lifeExp ~ gdpPercap + continent, my_gapminder) %*% x$Estimate
+my_df <- data.frame(actual = my_gapminder$lifeExp, fitted = y)
+ggplot(my_df, aes(x = fitted, y = actual)) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0, col = "red", lty = 2) + 
+  theme_bw(base_size = 15) +
+  labs(x = "Fitted values", y = "Actual values", title = "Actual vs. Fitted") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+Since the red dashed line represents a linear line with a slope of one, the closer the black dots to the red line, the more accurate the linear regression fitted that value. From the plot, we could see that values from 70 to 85 are very close the the red line. This tells us linear regression may work on a specific interval depending on the pattern of the data.
+
+## Tutorial for my_knn_cv
+For this part, we will work on another dataset `my_penguins`. `my_knn_cv` performs a k nearest neighbors cross validation on the given data. k nearest neighbor is a statistical prediction algorithm which predicts the class of each observation, and cross validation is a method to evaluate the prediction made by knn. The k-fold cross validation involves splitting data into k folds and using 1 fold as training as the rest as tesing data each time, and switching the training data until every fold has been used for training. In the end, calculate the squared error from all the training and this error can be used as an evaluation of how good our model is. Cross validation allows us to use the full data to train the model after evaluating the error of each model, instead of sacrificing part of our data as the testing data.
+
+`my_knn_cv` takes 4 inputs. `train` represenst the training data. `cl` represents the true class variables of the training data. `k_nn` represents the number of neighbors, and `k_cv` represents the number of folds for cross validation. The output is a list composed of `class` and `cv_err`. `class` is the predicted class of all observations and `cv_err` is the cross-validation misclassification error. 
+
+Below is an example using `my_knn_cv`. It predicts output class `species` using covariates bill_length_mm, bill_depth_mm, flipper_length_mm, and body_mass_g. It also uses a 5 fold cross validation, while predicting the class using the k nearest neighbors varying from 1 to 10. Then we will use a table to record the training misclassification rates and the cross validation misclassification rate.
+
+```{r}
+penguins <- my_penguins %>% drop_na()
+train <- select(penguins, bill_length_mm,
+                bill_depth_mm, flipper_length_mm, body_mass_g)
+cl <- penguins$species
+cv_errors <- rep(0, 10)
+train_errors <- rep(0, 10)
+for (i in 1:10) {
+  cv_errors[i] <- my_knn_cv(train, cl, i, 5)[[2]]
+  predict <- class::knn(train, train, cl, k=i)
+  train_errors[i] <- mean(predict != cl)
+}
+t <- data.frame(
+  "k" = c(1:10),
+  "cv error" = cv_errors,
+  "train error" = train_errors
+)
+t
+```
+
+Based on the table, k_nn = 1 is the lowest in both cv.error and train.error, so I would choose a model of 1-nearest neighbor based on both the cv error and the train error. In practice, I would still choose k=1 model because the cv.error is lowest for k = 1, and lower cv.error means lower misclassification rate in practice.
+
+## Tutorial for my_rf_cv
+`my_rf_cv` performs a random forest prediction algorithm, and then use a k fold cross validation to evaluation the prediction model. It specifically focuses on `my_penguins` data and does not work on any other data. It takes an numeric input `k` indicating the number of folds and it returns a numeric output representing the cross validation error. Below is an example of how to use it using different k including 2, 5, 10. Since random forest is a random process, we will repeat each k with 30 trials. We will also create a boxplot graphing the cv error for each k, and will also use a table to demonstrate the mean and standard deviation of each k.
+
+```{r}
+# initialize the matrix
+m <- data.frame(matrix(nrow = 3, ncol = 30))
+mean_err <- rep(0, 3)
+std_err <- rep(0, 3)
+# perform the 3*30 trials of cross validation
+for (i in c(2, 5, 10)) {
+  for (j in 1:30) {
+    if (i == 2) {
+      m[1, j] <- my_rf_cv(i)
+    } else if (i == 5) {
+      m[2, j] <- my_rf_cv(i)
+    } else {
+      m[3, j] <- my_rf_cv(i)
+    }
+  }
+}
+for (i in 1:3) {
+  mean_err[i] <- rowMeans(m[i,])
+  std_err[i] <- sd(m[i,])
+}
+row.names(m) <- c(2, 5, 10)
+m$group <- row.names(m)
+dat.m <- melt(m, id.vars = "group")
+ggplot(data = dat.m,
+       aes(x = group, y = value)) +
+  geom_boxplot(fill="lightblue") +
+  theme_bw(base_size = 20) +
+  labs(title = "CV error for k = 2, 5, 10", xlab = "k", ylab="cv error") +
+  theme(plot.title =
+          element_text(hjust = 0.5))
+
+t <- data.frame(
+  "k" = c(2, 5, 10),
+  "mean" = mean_err,
+  "std" = std_err
+)
+t
+```
+In general as k increases there is less bias towards estimating the true error of our model, but higher variance. Judging from the boxplot and the table, Both the mean error and the standard deviation of the error is decreasing as the number of folds increases. This happens because the k is relatively small and increasing it significantly improve both the bias and the variance.

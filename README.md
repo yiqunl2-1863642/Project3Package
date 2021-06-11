@@ -16,4 +16,15 @@ You can install the package through Github using the following code:
 install.github("yiqunl2-1863642/Project3Package")
 ```
 
+To view the vignette:
+
+``` r
+devtools::install_github("yiqunl2-1863642/Project3Package", build_vignette = TRUE, build_opts = c())
+library(Demo)
+# Use this to view the vignette in the Demo HTML help
+help(package = "Project3Package", help_type = "html")
+# Use this to view the vignette as an isolated HTML file
+utils::browseVignettes(package = "Project3Package")
+```
+
 
